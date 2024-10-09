@@ -35,13 +35,14 @@ class Workout(Base):
     workout_type = Column(String, index=True)
     distance = Column(Float)
     time = Column(Float)  # in minutes
-    date = Column(DateTime, default=datetime.utcnow)
+    date = Column(DateTime, default=datetime.now())
 
 # Pydantic model for input validation
 class WorkoutCreate(BaseModel):
     workout_type: str = Field(..., example="running")
     distance: float = Field(..., example=5.0)  # in kilometers
     time: float = Field(..., example=30.0)  # in minutes
+    date: datetime = Field(default_factory=datetime.now, example="2023-06-01T12:00:00")
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -66,6 +67,7 @@ def log_workout(workout: WorkoutCreate, db: Session = Depends(get_db)):
         workout_type=workout.workout_type,
         distance=workout.distance,
         time=workout.time,
+        date=workout.date
     )
     db.add(db_workout)
     db.commit()
