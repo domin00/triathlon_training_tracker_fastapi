@@ -3,3 +3,7 @@ fastapi
 sqlalchemy
 uvicorn  
 pydantic
+streamlit
+pandas
+plotly
+    
