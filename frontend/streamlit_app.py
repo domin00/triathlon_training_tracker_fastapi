@@ -10,7 +10,8 @@ def main():
     st.title("Workout Tracker")
     log_workout()
     display_workout_history()
-    
+    workouts = get_workout_history()
+    plot_workout_distance_over_time(workouts)
 
 # write the function to log a workout in streamlit and post it to the api
 def log_workout():
@@ -67,5 +68,28 @@ def plot_workout_history(workouts):
     # Display the plot
     st.plotly_chart(fig)
 
+# function that displays the workout history as a plot of total distance over time for each workout type
+def plot_workout_distance_over_time(workouts):
+    df = pd.DataFrame(workouts)
+    df['date'] = pd.to_datetime(df['date'], format='mixed')
+
+    # Group the data by date and workout_type, summing the distances
+    df_grouped = df.groupby([df['date'].dt.date, 'workout_type'])['distance'].sum().reset_index()
+
+    # Calculate cumulative sum of distance for each workout type
+    df_grouped['cumulative_distance'] = df_grouped.groupby('workout_type')['distance'].cumsum()
+
+    # Create a line plot
+    fig = px.line(df_grouped, x='date', y='cumulative_distance', color='workout_type', 
+                 title='Cumulative Workout Distance Over Time',
+                 labels={'date': 'Date', 'cumulative_distance': 'Total Distance (km)', 'workout_type': 'Workout Type'})
+
+    # Customize the layout
+    fig.update_layout(xaxis_tickangle=-45)
+
+    # Display the plot
+    st.plotly_chart(fig)
+
+    
 if __name__ == "__main__":
     main()
