@@ -9,8 +9,9 @@ import plotly.express as px
 def main():
     st.title("Workout Tracker")
     log_workout()
-    display_workout_history()
     workouts = get_workout_history()
+    
+    display_workout_history()
     plot_workout_distance_over_time(workouts)
 
 # write the function to log a workout in streamlit and post it to the api
@@ -42,15 +43,49 @@ def display_workout_history():
     st.subheader("Workout History")
     workouts = get_workout_history()
     if workouts:
+        with st.expander("View Workout History Table"):
+            table_workout_history(workouts)
         plot_workout_history(workouts)
+
+def table_workout_history(workouts):
+    df = pd.DataFrame(workouts)
+    df['date'] = pd.to_datetime(df['date'], format='mixed')
+    df = df.sort_values('date', ascending=False)
+
+    # display the workout history in a table with delete buttons
+    for index, row in df.iterrows():
+        col1, col2, col3, col4, col5, col6 = st.columns([2, 2, 2, 2, 2, 1])
+        with col1:
+            st.write(row['date'].strftime('%Y-%m-%d'))
+        with col2:
+            st.write(row['workout_type'])
+        with col3:
+            st.write(f"{row['distance']:.2f} km")
+        with col4:
+            st.write(f"{row['time']:.2f} min")
+        with col5:
+            st.write(row['id'])
+        with col6:
+            if st.button('❌', key=f"delete_{row['id']}", help="Delete this workout"):
+                response = requests.delete(f"http://localhost:8000/workout/{row['id']}")
+                if response.status_code == 200:
+                    st.session_state.delete_success = f"Workout {row['id']} deleted successfully!"
+                    st.rerun()
+                else:
+                    st.session_state.delete_error = "Failed to delete workout"
+
+    # Display success or error message below the table
+    if 'delete_success' in st.session_state:
+        st.success(st.session_state.delete_success)
+        del st.session_state.delete_success
+    elif 'delete_error' in st.session_state:
+        st.error(st.session_state.delete_error)
+        del st.session_state.delete_error   
     
 def plot_workout_history(workouts):
     
     df = pd.DataFrame(workouts)
     df['date'] = pd.to_datetime(df['date'], format='mixed')
-
-    # display the workout history in a table
-    st.write(df)
 
     # plot the workout history
     # Group the data by date and workout_type, summing the distances
