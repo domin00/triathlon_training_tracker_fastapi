@@ -79,3 +79,13 @@ def log_workout(workout: WorkoutCreate, db: Session = Depends(get_db)):
 def get_workout_history(db: Session = Depends(get_db)):
     workouts = db.query(Workout).all()
     return workouts
+
+# API to delete a specified workout
+@app.delete("/workout/{workout_id}")
+def delete_workout(workout_id: int, db: Session = Depends(get_db)):
+    workout = db.query(Workout).filter(Workout.id == workout_id).first()
+    if workout is None:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    db.delete(workout)
+    db.commit()
+    return {"message": f"Workout with id {workout_id} has been deleted"}
