@@ -24,7 +24,7 @@ def log_workout():
     date = pd.to_datetime(date).isoformat()  # Convert to ISO format string
     if st.button("Log Workout"):
         workout = {"workout_type": workout_type.lower(), "distance": distance, "time": time, "date": date}
-        response = requests.post("triathlon-training-tracker.vercel.app/workout", json=workout)
+        response = requests.post("https://triathlon-training-tracker-fastapi.onrender.com/workout", json=workout)
         if response.status_code == 200:
             st.success("Workout logged successfully!")
         else:
@@ -32,7 +32,7 @@ def log_workout():
 
 # write the function to get the workout history from the api and display it in streamlit
 def get_workout_history():
-    response = requests.get("triathlon-training-tracker.vercel.app/workouts")
+    response = requests.get("https://triathlon-training-tracker-fastapi.onrender.com/workouts")
     if response.status_code == 200:
         return response.json()
     else:
@@ -67,7 +67,7 @@ def table_workout_history(workouts):
             st.write(row['id'])
         with col6:
             if st.button('❌', key=f"delete_{row['id']}", help="Delete this workout"):
-                response = requests.delete(f"triathlon-training-tracker.vercel.app/workout/{row['id']}")
+                response = requests.delete(f"https://triathlon-training-tracker-fastapi.onrender.com/workout/{row['id']}")
                 if response.status_code == 200:
                     st.session_state.delete_success = f"Workout {row['id']} deleted successfully!"
                     st.rerun()
