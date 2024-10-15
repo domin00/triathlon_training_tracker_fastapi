@@ -59,6 +59,11 @@ def get_db():
     finally:
         db.close()
 
+# home page 
+@app.get('/')
+def welcome():
+    return "Welcome to the Triathlon Training Tracker API page!"
+
 # API to log a workout
 @app.post("/workout")
 def log_workout(workout: WorkoutCreate, db: Session = Depends(get_db)):
