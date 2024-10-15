@@ -6,4 +6,4 @@ pydantic
 streamlit
 pandas
 plotly
-    
+mangum

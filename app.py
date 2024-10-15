@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from typing import Annotated
 from fastapi import Depends, HTTPException, Query, Path, Body, Form
 from sqlalchemy.orm import Session
+from mangum import Mangum
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -19,6 +20,9 @@ app = FastAPI()
 
 # Get the database URL from environment variables
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Initialize the Mangum handler
+handler = Mangum(app)
 
 # SQLite setup
 engine = create_engine(DATABASE_URL)
