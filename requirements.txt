@@ -1,9 +1,3 @@
-python-dotenv
-fastapi
-sqlalchemy
-uvicorn  
-pydantic
 streamlit
 pandas
 plotly
-mangum
